@@ -1,100 +1,132 @@
 <?php
 session_start();
-require('vendor/autoload.php'); // Ensure Razorpay SDK is installed via Composer
+require __DIR__ . '/vendor/autoload.php';
 
 use Razorpay\Api\Api;
 
 // Razorpay API Credentials
 $api_key = "YOUR_RAZORPAY_KEY_ID";
 $api_secret = "YOUR_RAZORPAY_SECRET";
-
 $api = new Api($api_key, $api_secret);
 
-// Fetch user details
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
+include 'includes/dbconnection.php';
 
-include 'includes/db_connection.php';
+// Retrieve amount from SESSION
+$amount = $_SESSION['booking_amount'];
+$booking_id = $_SESSION['booking_id'];
 
-$user_id = $_SESSION['user_id'];
-$query = "SELECT * FROM users WHERE id = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-
-// Fetch pending booking details
-$booking_query = "SELECT * FROM bookings WHERE user_id = ? AND status = 'Pending' LIMIT 1";
-$stmt = $conn->prepare($booking_query);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$booking_result = $stmt->get_result();
-$booking = $booking_result->fetch_assoc();
-
-if (!$booking) {
+if (!$amount) {
     echo "<script>alert('No pending booking found!'); window.location.href='index.php';</script>";
     exit();
 }
 
 // Create a Razorpay order
 $orderData = [
-    'receipt'         => "BOOKING_" . $booking['id'],
-    'amount'          => $booking['amount'] * 100, // Convert to paise
+    'receipt'         => "BOOKING_" . $booking_id,
+    'amount'          => $amount * 100,
     'currency'        => 'INR',
-    'payment_capture' => 1 // Auto-capture payment
+    'payment_capture' => 1
 ];
 
 $order = $api->order->create($orderData);
 $order_id = $order['id'];
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment</title>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Online Banquet Booking System | Payment</title>
+
+    <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+
+    <!-- bootstrap-css -->
+    <link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+    <!--// bootstrap-css -->
+    <!-- css -->
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
+    <!--// css -->
+    <!-- font-awesome icons -->
+    <link href="css/font-awesome.css" rel="stylesheet"> 
+    <!-- //font-awesome icons -->
+    <!-- font -->
+    <link href="//fonts.googleapis.com/css?family=Josefin+Sans:100,100i,300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
+    <link href='//fonts.googleapis.com/css?family=Roboto+Condensed:400,700italic,700,400italic,300italic,300' rel='stylesheet' type='text/css'>
+    <!-- //font -->
+    <script src="js/jquery-1.11.1.min.js"></script>
+    <script src="js/bootstrap.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h2>Complete Your Payment</h2>
-        <p>Booking ID: <?php echo htmlspecialchars($booking['id']); ?></p>
-        <p>Amount: ₹<?php echo htmlspecialchars($booking['amount']); ?></p>
-
-        <button id="rzp-button1" class="btn btn-success">Pay Now</button>
+    <!-- banner -->
+    <div class="banner jarallax">
+        <div class="agileinfo-dot">
+            <?php include_once('includes/header.php');?>
+            <div class="wthree-heading">
+                <h2>Complete Your Payment</h2>
+            </div>
+        </div>
     </div>
+    <!-- //banner -->
+    
+    <!-- payment section -->
+    <div class="contact">
+        <div class="container">
+            <div class="agile-contact-form">
+                <div class="col-md-6 contact-form-right">
+                    <div class="contact-form-top">
+                        <h3>Payment Details</h3>
+                    </div>
+                    <div class="agileinfo-contact-form-grid">
+                        <form>
+                            <div class="form-group row">
+                                <label class="col-form-label col-md-4">Booking ID:</label>
+                                <div class="col-md-10">
+                                    <p style="font-size: 20px"><strong><?php echo htmlspecialchars($booking_id); ?></strong></p>
+                                </div>
+                            </div>
 
-    <script>
-        var options = {
-            "key": "<?php echo $api_key; ?>",
-            "amount": "<?php echo $booking['amount'] * 100; ?>",
-            "currency": "INR",
-            "name": "OBBS",
-            "description": "Banquet Booking Payment",
-            "image": "https://yourwebsite.com/logo.png",
-            "order_id": "<?php echo $order_id; ?>",
-            "handler": function (response){
-                window.location.href = "payment-success.php?payment_id=" + response.razorpay_payment_id;
-            },
-            "prefill": {
-                "name": "<?php echo $user['name']; ?>",
-                "email": "<?php echo $user['email']; ?>",
-                "contact": "<?php echo $user['phone']; ?>"
-            },
-            "theme": {
-                "color": "#3399cc"
-            }
-        };
-        var rzp1 = new Razorpay(options);
-        document.getElementById('rzp-button1').onclick = function(e){
-            rzp1.open();
-            e.preventDefault();
-        }
-    </script>
+                            <div class="form-group row">
+                                <label class="col-form-label col-md-4">Amount:</label>
+                                <div class="col-md-10">
+                                    <p style="font-size: 20px; color: green;"><strong>₹<?php echo htmlspecialchars($amount); ?></strong></p>
+                                </div>
+                            </div>
+
+                            <br>
+                            <div class="tp">
+                                <button id="rzp-button1" class="btn btn-primary">Pay Now</button>
+                            </div>
+                        </form>
+
+                        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+                        <script>
+                            var options = {
+                                "key": "<?php echo $api_key; ?>",
+                                "amount": "<?php echo $amount * 100; ?>",
+                                "currency": "INR",
+                                "order_id": "<?php echo $order_id; ?>",
+                                "handler": function (response){
+                                    window.location.href = "payment-success.php?payment_id=" + response.razorpay_payment_id;
+                                }
+                            };
+                            var rzp1 = new Razorpay(options);
+                            document.getElementById('rzp-button1').onclick = function(e){
+                                rzp1.open();
+                                e.preventDefault();
+                            }
+                        </script>
+
+                    </div>
+                </div>
+
+                <div class="clearfix"> </div>
+            </div>
+        </div>
+    </div>
+    <!-- //payment section -->
+
+    <?php include_once('includes/footer.php'); ?>
+
+    <!-- jarallax -->
+    <script src="js/jarallax.js"></script>
+    <script src="js/SmoothScroll.min.js"></script>
 </body>
 </html>

@@ -16,7 +16,9 @@ $query-> bindParam(':password', $password, PDO::PARAM_STR);
     if($query->rowCount() > 0)
 {
 foreach ($results as $result) {
-$_SESSION['odmsaid']=$result->ID;
+    $_SESSION['obbsuid'] = $result->ID; // Ensure the session variable matches book-services.php
+    $_SESSION['login'] = $_POST['username'];
+    ;
 }
 
   if(!empty($_POST["remember"])) {
