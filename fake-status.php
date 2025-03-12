@@ -7,27 +7,39 @@ if ($status == "success") {
     $message = "Payment Successful! ✅";
     $color = "green";
     $buttonText = "Make a New Booking";
-    $buttonLink = "services.php";  // Redirects to services page
+    $buttonLink = "services.php";
 } else {
     $message = "Payment Failed! ❌";
     $color = "red";
     $buttonText = "Try Again";
-    $buttonLink = "fake-process.php";  // Redirects back to payment page
+    $buttonLink = "fake-payment.php";
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Status</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
 </head>
 <body>
-    <div class="container text-center mt-5">
-        <h2 style="color: <?php echo $color; ?>"><?php echo $message; ?></h2>
-        <a href="<?php echo $buttonLink; ?>" class="btn btn-primary mt-3"><?php echo $buttonText; ?></a>
+    <div class="banner jarallax">
+        <div class="agileinfo-dot">
+            <?php include_once('includes/header.php'); ?>
+            <div class="wthree-heading">
+                <h2>Payment Status</h2>
+            </div>
+        </div>
     </div>
+
+    <div class="contact">
+        <div class="container text-center">
+            <h2 style="color: <?php echo $color; ?>"><?php echo $message; ?></h2>
+            <a href="<?php echo $buttonLink; ?>" class="btn btn-primary mt-3"><?php echo $buttonText; ?></a>
+        </div>
+    </div>
+
+    <?php include_once('includes/footer.php'); ?>
 </body>
 </html>
