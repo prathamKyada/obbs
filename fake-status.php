@@ -6,7 +6,7 @@ $status = isset($_GET['status']) ? $_GET['status'] : 'failure';
 if ($status == "success") {
     $message = "Payment Successful! ✅";
     $color = "green";
-    $buttonText = "Make a New Booking";
+    $buttonText = "Make a New Booking.....";
     $buttonLink = "services.php";
 } else {
     $message = "Payment Failed! ❌";
@@ -16,6 +16,7 @@ if ($status == "success") {
 }
 ?>
 
+<!-- HTML starts here -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,15 +36,26 @@ if ($status == "success") {
 
     <div class="contact">
         <div class="container text-center">
-        <h2 style="color: <?php echo $color; ?>"><?php echo $message; ?></h2>
-        <p>Would you like to receive your receipt on Gmail?</p>
-        <form action="send-receipt.php" method="post">
-            <input type="hidden" name="booking_id" value="<?php echo $_SESSION['booking_id']; ?>">
-            <button type="submit" class="btn btn-success">Send via Gmail</button>
-        </form>
-        <br>
-        <a href="services.php" class="btn btn-primary mt-3">Make a New Booking</a>
+        <pre>
+<?php
+echo "DEBUG:\n";
+echo "Status: $status\n";
+echo "Session booking_id: " . ($_SESSION['booking_id'] ?? 'NOT SET');
+?>
+</pre>
 
+            <h2 style="color: <?php echo $color; ?>"><?php echo $message; ?></h2>
+
+            <?php if ($status == "success"): ?>
+                <p>Would you like to receive your receipt on Gmail?</p>
+                <form action="send-receipt.php" method="post">
+                    <input type="hidden" name="booking_id" value="<?php echo $_SESSION['booking_id']; ?>">
+                    <button type="submit" class="btn btn-success">Send via Gmail</button>
+                </form>
+            <?php endif; ?>
+
+            <br>
+            <a href="<?php echo $buttonLink; ?>" class="btn btn-primary mt-3"><?php echo $buttonText; ?></a>
         </div>
     </div>
 
