@@ -35,8 +35,15 @@ if ($status == "success") {
 
     <div class="contact">
         <div class="container text-center">
-            <h2 style="color: <?php echo $color; ?>"><?php echo $message; ?></h2>
-            <a href="<?php echo $buttonLink; ?>" class="btn btn-primary mt-3"><?php echo $buttonText; ?></a>
+        <h2 style="color: <?php echo $color; ?>"><?php echo $message; ?></h2>
+        <p>Would you like to receive your receipt on Gmail?</p>
+        <form action="send-receipt.php" method="post">
+            <input type="hidden" name="booking_id" value="<?php echo $_SESSION['booking_id']; ?>">
+            <button type="submit" class="btn btn-success">Send via Gmail</button>
+        </form>
+        <br>
+        <a href="services.php" class="btn btn-primary mt-3">Make a New Booking</a>
+
         </div>
     </div>
 
