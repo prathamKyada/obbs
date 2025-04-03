@@ -62,3 +62,4 @@ echo "Session booking_id: " . ($_SESSION['booking_id'] ?? 'NOT SET');
     <?php include_once('includes/footer.php'); ?>
 </body>
 </html>
+   
